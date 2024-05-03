@@ -29,7 +29,7 @@
 
   :data  (json-encode (list (cons "model" assistant-model)
 			   (cons "prompt" assistant-prompt)))
-  :headers '(("Accept" . "text/plain")
+  :headers '(("Accept" . "application/json")
 			 ("Content-Type" . "application/json")
 			 )
 
