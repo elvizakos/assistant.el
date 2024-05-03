@@ -6,9 +6,9 @@
 ;; }'
 
 (setq
- ;;assistant-server-url "http://192.168.68.8:11435/api/generate"
- assistant-server-url "http://lvzcms.debian.home.lan/tests/requests?f=json"
- assistant-model "yi"
+ assistant-server-url "http://192.168.68.8:11434/api/generate"
+ ;; assistant-server-url "http://lvzcms.debian.home.lan/tests/requests?f=text"
+ assistant-model "qwen:0.5b"
  assistant-prompt "Why is the sky blue?"
  )
 
@@ -16,13 +16,22 @@
   assistant-server-url
   :type "POST"
 
-  :data  (json-encode (list (cons "model" assistant-model)
-							(cons "prompt" assistant-prompt)))
+  ;; :params (list (cons "model" assistant-model)
+  ;; 				(cons "prompt" assistant-prompt))
+  ;; :data  (format "model=%s&prompt=%s" assistant-model assistant-prompt)
+
+  ;; :headers '(("Content-Type" . "application/json"))
+
   ;; :data  (json-encode `(("model" . ,assistant-model)
   ;; 						("prompt" . ,assistant-prompt)))
+  ;; :parser 'json-read
 
-  :headers '(("Content-Type" . "application/json"))
-  :parser 'json-read
+
+  :data  (json-encode (list (cons "model" assistant-model)
+			   (cons "prompt" assistant-prompt)))
+  :headers '(("Accept" . "text/plain")
+			 ("Content-Type" . "application/json")
+			 )
 
   :success (cl-function
 			(lambda (&key data &allow-other-keys)
