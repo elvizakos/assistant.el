@@ -29,6 +29,11 @@
 (defgroup assistant nil "Assistant minor mode settings."
   :group 'tools)
 
+(defcustom assistant/assistant-ask-chatbot-keycomb "C-x C-?" "Default key combination for asking the chat bot"
+  :type 'string
+  :group 'assistant
+  )
+
 (defcustom assistant/lighter " A" "Label of minor mode for the modeline."
   :type 'string
   :group 'assistant)
@@ -54,33 +59,35 @@
 
 ;;---- FUNCTIONS ------------------------------------------------------------------
 
-(defun assistant/json-get-response ( str )
+(defun assistant/json-get-response ( str ) "Get response from server and turn it to string"
   (let ((ar (split-string str "\n"))
 		(i 0)
 		(itm "")
 		(res "")
 		(done nil)
+		(model "")
 		(ret "")
 		)
 	(while (< i (+ 1 (length ar)))
 	  (if (and (string= (type-of (nth i ar)) "string") (> (length (nth i ar)) 0) (string= (substring (nth i ar) 0 1) "{"))
 		  (setq itm (json-parse-string (nth i ar))
+				model (gethash "model" itm)
 				res (gethash "response" itm)
 				done (gethash "done" itm))
 		)
 	  (setq i (1+ i)
 			ret (concat ret res))
 	  )
-	ret))
+	;; (concat model " - " ret)
+	ret ))
 
 (defun assistant/request ( model prompt ) "Function to get response "
 	   (setq assistant/response ""
 			 assistant/$buffer (get-buffer-create assistant/buffer-name))
 	   ;; (set-buffer assistant/$buffer)
-	   (other-window 1 t)
-	   (switch-to-buffer assistant/$buffer)
 	   (with-current-buffer assistant/$buffer
 		 (erase-buffer)
+		 (markdown-mode)
 
 		 (request
 		   assistant/server-url
@@ -95,7 +102,8 @@
 
 		   :success (cl-function
 					 (lambda (&key data &allow-other-keys)
-						 (insert (assistant/json-get-response data))))
+					   (with-current-buffer assistant/$buffer
+						 (insert (assistant/json-get-response data)))))
 
 		   :error (cl-function
 				   (lambda (&key error-thrown &allow-other-keys&rest _)
@@ -109,8 +117,16 @@
 		   ;; 				(200 . (lambda (&rest _) (message "Got 200")))
 		   ;; 				)
 		   ))
+	   ;;(other-window 1 t)
+	   ;;(switch-to-buffer assistant/$buffer)
 	   nil
 	   )
+
+(defun assistant/askchatbot () "Function to ask the chat bot"
+	   (interactive)
+	   (let ((userinput (read-string ">>> ")))
+		 (assistant/request assistant/chat-model userinput)
+		 ))
 
 ;;---- MINOR MODE ------------------------------------------------------------------
 (define-minor-mode assistant-mode "Assistant minor mode."
@@ -119,9 +135,20 @@
 			(require 'request)
 			(require 'json)
 
-			(setq assistant/$buffer (get-buffer-create assistant/buffer-name))
 			;; (setq assistant/$buffer (get-buffer-create assistant/buffer-name))
-			
+			;; (setq assistant/$buffer (get-buffer-create assistant/buffer-name))
+			;;;;;;;; Lighter menu
+			(define-key-after		 ; Menu for Assistant mode
+			  assistant/assinstant-keymap
+			  [menu-bar assistantmenu]
+			  (cons "Assistant" (make-sparse-keymap "assinstant mode"))
+			  'kill-buffer)
+
+			(define-key assistant/assistant-keymap [menu-bar assistantmenu assistantmenuaskchatbot]
+			  '("Ask bot" . assistant/askchatbot))
+
+			;;;;;;;; Keyboard shortcuts
+			(define-key assistant/assistant-keymap (kbd assistant/assistant-ask-chatbot-keycomb) 'assistant/askchatbot)
 
 			assistant/assistant-keymap)
   :global 1
