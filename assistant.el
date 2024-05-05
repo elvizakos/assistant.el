@@ -25,6 +25,8 @@
 
 (defvar assistant/$buffer nil "The assistant's buffer.")
 
+(defvar assistant/bufferpoint 0 "The last position of cursor.")
+
 ;;---- OPTIONS --------------------------------------------------------------------
 (defgroup assistant nil "Assistant minor mode settings."
   :group 'tools)
@@ -64,6 +66,26 @@
 
 ;;---- FUNCTIONS ------------------------------------------------------------------
 
+(defun assistant/split-window () "Function to split window if there is no second window."
+	   (let ((otherwindow nil)
+			 (currentwindow nil))
+		 (if (one-window-p) (split-window-right))
+
+		 (setq currentwindow (selected-window)
+			   otherwindow (window-next-sibling)
+			   assistant/$buffer (get-buffer-create assistant/buffer-name))
+		 (set-window-buffer otherwindow assistant/$buffer)
+		 (with-current-buffer assistant/$buffer
+		   ;; (erase-buffer)
+		   (markdown-mode)
+		   (goto-char (point-max))
+
+		   (set-window-point
+			(get-buffer-window (current-buffer) 'visible)
+			(point-max))
+		   )
+		 ))
+
 (defun assistant/json-get-response ( str ) "Get response from server and turn it to string"
   (let ((ar (split-string str "\n"))
 		(i 0)
@@ -87,48 +109,47 @@
 	ret ))
 
 (defun assistant/request ( model prompt ) "Function to get response "
-	   (setq assistant/response ""
-			 assistant/$buffer (get-buffer-create assistant/buffer-name))
-	   ;; (set-buffer assistant/$buffer)
-	   (with-current-buffer assistant/$buffer
-		 (erase-buffer)
-		 (markdown-mode)
+	   (setq assistant/response "")
 
-		 (request
-		   assistant/server-url
-		   :type "POST"
+	   (request
+		 assistant/server-url
+		 :type "POST"
 
-		   :data  (json-encode (list (cons "model" model)
-									 (cons "prompt" prompt)))
-		   ;; :parser 'json-read
+		 :data  (json-encode (list (cons "model" model)
+								   (cons "prompt" prompt)))
+		 ;; :parser 'json-read
 
-		   :headers '(("Accept" . "application/json")
-					  ("Content-Type" . "application/json"))
+		 :headers '(("Accept" . "application/json")
+					("Content-Type" . "application/json"))
 
-		   :success (cl-function
-					 (lambda (&key data &allow-other-keys)
-					   (with-current-buffer assistant/$buffer
-						 (insert (assistant/json-get-response data)))))
+		 :success (cl-function
+				   (lambda (&key data &allow-other-keys)
+					 (with-current-buffer assistant/$buffer
+					   (goto-char (point-max))
+					   (insert (assistant/json-get-response data)))))
 
-		   :error (cl-function
-				   (lambda (&key error-thrown &allow-other-keys&rest _)
-					 (error "Error: %S" error-thrown)
-					 ))
+		 :error (cl-function
+				 (lambda (&key error-thrown &allow-other-keys&rest _)
+				   (error "Error: %S" error-thrown)
+				   ))
 
-		   :complete (lambda (&rest _) (message "Finished!"))
+		 :complete (lambda (&rest _) (message "Finished!"))
 
-		   ;; :status-code '((400 . (lambda (&rest _) (message "Got 400")))
-		   ;; 				(418 . (lambda (&rest _) (message "Got 418")))
-		   ;; 				(200 . (lambda (&rest _) (message "Got 200")))
-		   ;; 				)
-		   ))
-
+		 ;; :status-code '((400 . (lambda (&rest _) (message "Got 400")))
+		 ;; 				(418 . (lambda (&rest _) (message "Got 418")))
+		 ;; 				(200 . (lambda (&rest _) (message "Got 200")))
+		 ;; 				)
+		 )
 	   nil
 	   )
 
 (defun assistant/askchatbot () "Function to ask the chat bot"
 	   (interactive)
+	   (assistant/split-window)
 	   (let ((userinput (read-string ">>> ")))
+		 (with-current-buffer assistant/$buffer
+		   (goto-char (point-max))
+		   (insert (format "\n------------------------------\n**YOU** - %s\n\n**%s** - " userinput assistant/chat-model)))
 		 (assistant/request assistant/chat-model userinput)
 		 ))
 
@@ -139,6 +160,14 @@
 		 ))
 
 (defun assistant/continue-my-code () "Function to continue the code the user is writing after the cursor."
+	   (interactive)
+	   )
+
+(defun assistant/change-chatbot () "Interactive function to change the chatbot in use."
+	   (interactive)
+	   )
+
+(defun assistant/change-coder () "Interactive function to change the coder ai in use."
 	   (interactive)
 	   )
 
