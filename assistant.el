@@ -95,6 +95,7 @@
 		   (set-window-point
 			(get-buffer-window (current-buffer) 'visible)
 			(point-max))
+		   (linum-mode 0)
 		   )
 		 ))
 
