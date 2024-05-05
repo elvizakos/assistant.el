@@ -98,7 +98,7 @@
 		   (toggle-truncate-lines 0)
 		   )
 		 ))
-(format-time-string "%Y")
+
 (defun assistant/json-get-response ( str ) "Get response from server and turn it to string"
   (let ((ar (split-string str "\n"))
 		(i 0)
