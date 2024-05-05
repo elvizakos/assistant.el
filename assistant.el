@@ -171,7 +171,7 @@
 		 ;; (assistant/request assistant/chat-model userinput)
 		 ))
 
-(defun assistant/continue-my-code () "Function to continue the code the user is writing after the cursor."
+(defun assistant/continue-from-here () "Function to continue the code the user is writing after the cursor."
 	   (interactive)
 	   )
 
