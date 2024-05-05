@@ -27,6 +27,8 @@
 
 (defvar assistant/bufferpoint 0 "The last position of cursor.")
 
+(defvar assistant/models-list nil "List of all models.")
+
 ;;---- OPTIONS --------------------------------------------------------------------
 (defgroup assistant nil "Assistant minor mode settings."
   :group 'tools)
@@ -37,6 +39,16 @@
   )
 
 (defcustom assistant/assistant-ask-codebot-keycomb "C-x / c" "Default key combination for asking the bot for code."
+  :type 'string
+  :group 'assistant
+  )
+
+(defcustom assistant/assistant-change-chat-model-keycomb "C-x c c" "Default key combination for changing chat model."
+  :type 'string
+  :group 'assistant
+  )
+
+(defcustom assistant/assistant-change-coding-model-keycomb "C-x c m" "Default key combination for changing coding model."
   :type 'string
   :group 'assistant
   )
@@ -149,7 +161,7 @@
 	   (let ((userinput (read-string ">>> ")))
 		 (with-current-buffer assistant/$buffer
 		   (goto-char (point-max))
-		   (insert (format "\n------------------------------\n**YOU** - %s\n\n**%s** - " userinput assistant/chat-model)))
+		   (insert (format "\n\n------------------------------\n\n**YOU** - %s\n\n**%s** - " userinput assistant/chat-model)))
 		 (assistant/request assistant/chat-model userinput)
 		 ))
 
@@ -165,11 +177,11 @@
 
 (defun assistant/change-chatbot () "Interactive function to change the chatbot in use."
 	   (interactive)
-	   )
+	   (setq assistant/chat-model (ido-completing-read "Select name of the AI: " assistant/models-list)))
 
 (defun assistant/change-coder () "Interactive function to change the coder ai in use."
 	   (interactive)
-	   )
+	   (setq assistant/coding-model (ido-completing-read "Select name of the AI: " assistant/models-list)))
 
 ;;---- MINOR MODE ------------------------------------------------------------------
 (define-minor-mode assistant-mode "Assistant minor mode."
@@ -177,6 +189,8 @@
   :keymap (let ((assistantmap (make-sparse-keymap)))
 			(require 'request)
 			(require 'json)
+
+			(setq assistant/models-list '("codegemma:2b" "codegemma:7b" "codellama:7b" "gemma:2b" "gemma:7b" "llama2:7b" "llama2:latest" "llama2:text" "llama2-uncensored:7b" "orca-mini:latest" "phi3:latest" "qwen:0.5b" "qwen:1.8b" "starcoder2:3b" "starcoder2:7b" "starcoder2:latest" "tinydolphin:latest" "tinyllama:latest" "yi:latest"))
 
 			;; (setq assistant/$buffer (get-buffer-create assistant/buffer-name))
 			;; (setq assistant/$buffer (get-buffer-create assistant/buffer-name))
@@ -193,8 +207,18 @@
 			(define-key assistant/assistant-keymap [menu-bar assistantmenu assistantmenuaskcoder]
 			  '("Ask for code" . assistant/askcoder))
 
+			(define-key assistant/assistant-keymap [menu-bar assistantmenu assistantmenuchatechatbot]
+			  '("Change chat model" . assistant/change-chatbot))
+
+			(define-key assistant/assistant-keymap [menu-bar assistantmenu assistantmenuchangecoder]
+			  '("Change coder model" . assistant/change-coder))
+
 			;;;;;;;; Keyboard shortcuts
 			(define-key assistant/assistant-keymap (kbd assistant/assistant-ask-chatbot-keycomb) 'assistant/askchatbot)
+
+			(define-key assistant/assistant-keymap (kbd assistant/assistant-change-chat-model-keycomb) 'assistant/change-chatbot)
+
+			(define-key assistant/assistant-keymap (kbd assistant/assistant-change-coding-model-keycomb) 'assistant/change-coder)
 
 			assistant/assistant-keymap)
   :global 1
