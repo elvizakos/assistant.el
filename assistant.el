@@ -7,7 +7,7 @@
 ;; Author: Nikos Skarmoutsos <elvizakos AT yahoo DOT gr>
 ;; Maintainer: Nikos Skarmoutsos
 ;; Created: May 2024
-;; Keywords: string
+;; Keywords: ai,gpt,chatgpt,llama,ollama,assistant
 ;; License: GNU General Public License >=2
 ;; Distribution: This file is not part of Emacs
 
