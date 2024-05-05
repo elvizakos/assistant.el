@@ -29,7 +29,12 @@
 (defgroup assistant nil "Assistant minor mode settings."
   :group 'tools)
 
-(defcustom assistant/assistant-ask-chatbot-keycomb "C-x C-?" "Default key combination for asking the chat bot"
+(defcustom assistant/assistant-ask-chatbot-keycomb "C-x / ?" "Default key combination for asking the chat bot."
+  :type 'string
+  :group 'assistant
+  )
+
+(defcustom assistant/assistant-ask-codebot-keycomb "C-x / c" "Default key combination for asking the bot for code."
   :type 'string
   :group 'assistant
   )
@@ -42,7 +47,7 @@
   :type 'string
   :group 'assistant)
 
-(defcustom assistant/chat-model "llama2:7b" "The model to be used for chat."
+(defcustom assistant/chat-model "qwen:0.5b" "The model to be used for chat."
   :type 'string
   ;;:type '(choice (const :tag "codegemma:2b" "codegemma:7b" "codellama:7b" "gemma:2b" "gemma:7b" "llama2:7b" "llama2:latest" "llama2:text" "llama2-uncensored:7b" "orca-mini:latest" "phi3:latest" "qwen:0.5b" "qwen:1.8b" "starcoder2:3b" "starcoder2:7b" "starcoder2:latest" "tinydolphin:latest" "tinyllama:latest" "yi:latest"))
   :group 'assistant)
@@ -117,8 +122,7 @@
 		   ;; 				(200 . (lambda (&rest _) (message "Got 200")))
 		   ;; 				)
 		   ))
-	   ;;(other-window 1 t)
-	   ;;(switch-to-buffer assistant/$buffer)
+
 	   nil
 	   )
 
@@ -127,6 +131,16 @@
 	   (let ((userinput (read-string ">>> ")))
 		 (assistant/request assistant/chat-model userinput)
 		 ))
+
+(defun assistant/askcoder () "Function to ask the coder bot and get code."
+	   (interactive)
+	   (let ((userinput (read-string ">>> ")))
+		 ;; (assistant/request assistant/chat-model userinput)
+		 ))
+
+(defun assistant/continue-my-code () "Function to continue the code the user is writing after the cursor."
+	   (interactive)
+	   )
 
 ;;---- MINOR MODE ------------------------------------------------------------------
 (define-minor-mode assistant-mode "Assistant minor mode."
@@ -139,13 +153,16 @@
 			;; (setq assistant/$buffer (get-buffer-create assistant/buffer-name))
 			;;;;;;;; Lighter menu
 			(define-key-after		 ; Menu for Assistant mode
-			  assistant/assinstant-keymap
+			  assistant/assistant-keymap
 			  [menu-bar assistantmenu]
 			  (cons "Assistant" (make-sparse-keymap "assinstant mode"))
 			  'kill-buffer)
 
 			(define-key assistant/assistant-keymap [menu-bar assistantmenu assistantmenuaskchatbot]
 			  '("Ask bot" . assistant/askchatbot))
+
+			(define-key assistant/assistant-keymap [menu-bar assistantmenu assistantmenuaskcoder]
+			  '("Ask for code" . assistant/askcoder))
 
 			;;;;;;;; Keyboard shortcuts
 			(define-key assistant/assistant-keymap (kbd assistant/assistant-ask-chatbot-keycomb) 'assistant/askchatbot)
