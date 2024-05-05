@@ -96,9 +96,10 @@
 			(get-buffer-window (current-buffer) 'visible)
 			(point-max))
 		   (linum-mode 0)
+		   (toggle-truncate-lines 0)
 		   )
 		 ))
-
+(format-time-string "%Y")
 (defun assistant/json-get-response ( str ) "Get response from server and turn it to string"
   (let ((ar (split-string str "\n"))
 		(i 0)
@@ -162,7 +163,7 @@
 	   (let ((userinput (read-string ">>> ")))
 		 (with-current-buffer assistant/$buffer
 		   (goto-char (point-max))
-		   (insert (format "\n\n------------------------------\n\n**YOU** - %s\n\n**%s** - " userinput assistant/chat-model)))
+		   (insert (format "\n\n------------------------------\n\n**YOU (%s)** - %s\n\n**%s (%s)** - " (format-time-string "%d-%m-%Y %H:%M:%S") userinput assistant/chat-model (format-time-string "%d-%m-%Y %H:%M:%S"))))
 		 (assistant/request assistant/chat-model userinput)
 		 ))
 
