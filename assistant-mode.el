@@ -207,6 +207,35 @@
 		 )
 	   nil)
 
+(defun assistant/get-list-of-models ()
+
+  (request
+	assistant/server-url
+	:type "POST"
+
+	:data  (json-encode (list (cons "model" model)
+							  (cons "prompt" prompt)))
+	;; :parser 'json-read
+
+	:headers '(("Accept" . "application/json")
+			   ("Content-Type" . "application/json"))
+
+	:success (cl-function
+			  (lambda (&key data &allow-other-keys)
+				(with-current-buffer assistant/$buffer
+				  (goto-char (point-max))
+				  ;; (insert (assistant/json-get-response data))
+				  (assistant/chat-window-scroll-to-bottom)
+				  )))
+
+	:error (cl-function
+			(lambda (&key error-thrown &allow-other-keys&rest _)
+			  (error "Error: %S" error-thrown)
+			  ))
+
+	:complete (lambda (&rest _) (message "Finished!")))
+  nil)
+
 (defun assistant/askchatbot () "Function to ask the chat bot"
 	   (interactive)
 	   (assistant/split-window)
