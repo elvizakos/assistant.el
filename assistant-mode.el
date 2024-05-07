@@ -257,7 +257,7 @@
 										  "llama2:7b"
 										  "llama2:latest"
 										  "llama2:text"
-										  "llama2-uncensored:7b"
+										  "llava:7b"
 										  "orca-mini:latest"
 										  "phi3:latest"
 										  "qwen:0.5b"
@@ -276,6 +276,20 @@
 												 "starcoder2:7b"
 												 "starcoder2:latest"
 												 )
+				  assistant/chat-models-list '("gemma:2b"
+											   "gemma:7b"
+											   "llama2:7b"
+											   "llama2:latest"
+											   "llama2:text"
+											   "llava:7b"
+											   "orca-mini:latest"
+											   "phi3:latest"
+											   "qwen:0.5b"
+											   "qwen:1.8b"
+											   "tinydolphin:latest"
+											   "tinyllama:latest"
+											   "yi:latest"
+											   )
 				  )
 
 			;; (setq assistant/$buffer (get-buffer-create assistant/buffer-name))
