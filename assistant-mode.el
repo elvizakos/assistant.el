@@ -249,7 +249,34 @@
 			(require 'request)
 			(require 'json)
 
-			(setq assistant/models-list '("codegemma:2b" "codegemma:7b" "codellama:7b" "gemma:2b" "gemma:7b" "llama2:7b" "llama2:latest" "llama2:text" "llama2-uncensored:7b" "orca-mini:latest" "phi3:latest" "qwen:0.5b" "qwen:1.8b" "starcoder2:3b" "starcoder2:7b" "starcoder2:latest" "tinydolphin:latest" "tinyllama:latest" "yi:latest"))
+			(setq assistant/models-list '("codegemma:2b"
+										  "codegemma:7b"
+										  "codellama:7b"
+										  "gemma:2b"
+										  "gemma:7b"
+										  "llama2:7b"
+										  "llama2:latest"
+										  "llama2:text"
+										  "llama2-uncensored:7b"
+										  "orca-mini:latest"
+										  "phi3:latest"
+										  "qwen:0.5b"
+										  "qwen:1.8b"
+										  "starcoder2:3b"
+										  "starcoder2:7b"
+										  "starcoder2:latest"
+										  "tinydolphin:latest"
+										  "tinyllama:latest"
+										  "yi:latest"
+										  )
+				  assistant/coding-models-list '("codegemma:2b"
+												 "codegemma:7b"
+												 "codellama:7b"
+												 "starcoder2:3b"
+												 "starcoder2:7b"
+												 "starcoder2:latest"
+												 )
+				  )
 
 			;; (setq assistant/$buffer (get-buffer-create assistant/buffer-name))
 			;; (setq assistant/$buffer (get-buffer-create assistant/buffer-name))
