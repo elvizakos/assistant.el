@@ -76,6 +76,10 @@
   :type 'string
   :group 'assistant)
 
+(defcustom assistant/list-api "api/tags" "The path to list models api"
+  :type 'string
+  :group 'assistant)
+
 (defcustom assistant/chat-model "qwen:0.5b" "The model to be used for chat."
   :type 'string
   ;;:type '(choice (const :tag "codegemma:2b" "codegemma:7b" "codellama:7b" "gemma:2b" "gemma:7b" "llama2:7b" "llama2:latest" "llama2:text" "llama2-uncensored:7b" "orca-mini:latest" "phi3:latest" "qwen:0.5b" "qwen:1.8b" "starcoder2:3b" "starcoder2:7b" "starcoder2:latest" "tinydolphin:latest" "tinyllama:latest" "yi:latest"))
@@ -150,7 +154,7 @@
 	   (setq assistant/response "")
 
 	   (request
-		 assistant/server-url
+		 (concat assistant/server-url assistant/talk-api)
 		 :type "POST"
 
 		 :data  (json-encode (list (cons "model" model)
@@ -184,7 +188,7 @@
 
 (defun assistant/requestCode ( model prompt ) "Function to get response for creating code in current buffer."
 	   (request
-		 assistant/server-url
+		 (concat assistant/server-url assistant/talk-api)
 		 :type "POST"
 
 		 :data  (json-encode (list (cons "model" model)
@@ -214,7 +218,7 @@
 (defun assistant/get-list-of-models () "List ollama models"
 
   (request
-	assistant/server-url
+	(concat assistant/server-url assistant/list-api)
 	:type "POST"
 
 	:data  (json-encode (list (cons "model" model)
