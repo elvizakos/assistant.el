@@ -151,98 +151,103 @@
 	ret ))
 
 (defun assistant/request ( model prompt ) "Function to get response "
-	   (setq assistant/response "")
+	   (let ((serverurl (concat assistant/server-url assistant/talk-api)))
 
-	   (request
-		 (concat assistant/server-url assistant/talk-api)
-		 :type "POST"
+		 (request
 
-		 :data  (json-encode (list (cons "model" model)
-								   (cons "prompt" prompt)))
-		 ;; :parser 'json-read
+		   serverurl
 
-		 :headers '(("Accept" . "application/json")
-					("Content-Type" . "application/json"))
+		   :type "POST"
 
-		 :success (cl-function
-				   (lambda (&key data &allow-other-keys)
-					 (with-current-buffer assistant/$buffer
-					   (goto-char (point-max))
-					   (insert (assistant/json-get-response data))
-					   (assistant/chat-window-scroll-to-bottom)
-					   )))
+		   :data  (json-encode (list (cons "model" model)
+									 (cons "prompt" prompt)))
+		   ;; :parser 'json-read
 
-		 :error (cl-function
-				 (lambda (&key error-thrown &allow-other-keys&rest _)
-				   (error "Error: %S" error-thrown)
-				   ))
+		   :headers '(("Accept" . "application/json")
+					  ("Content-Type" . "application/json"))
 
-		 :complete (lambda (&rest _) (message "Finished!"))
+		   :success (cl-function
+					 (lambda (&key data &allow-other-keys)
+					   (with-current-buffer assistant/$buffer
+						 (goto-char (point-max))
+						 (insert (assistant/json-get-response data))
+						 (assistant/chat-window-scroll-to-bottom)
+						 )))
 
-		 ;; :status-code '((400 . (lambda (&rest _) (message "Got 400")))
-		 ;; 				(418 . (lambda (&rest _) (message "Got 418")))
-		 ;; 				(200 . (lambda (&rest _) (message "Got 200")))
-		 ;; 				)
-		 )
-	   nil)
+		   :error (cl-function
+				   (lambda (&key error-thrown &allow-other-keys&rest _)
+					 (error "Error: %S" error-thrown)
+					 ))
+
+		   :complete (lambda (&rest _) (message "Finished!"))
+
+		   ;; :status-code '((400 . (lambda (&rest _) (message "Got 400")))
+		   ;; 				(418 . (lambda (&rest _) (message "Got 418")))
+		   ;; 				(200 . (lambda (&rest _) (message "Got 200")))
+		   ;; 				)
+		   )
+		 nil))
 
 (defun assistant/requestCode ( model prompt ) "Function to get response for creating code in current buffer."
-	   (request
-		 (concat assistant/server-url assistant/talk-api)
-		 :type "POST"
+	   (let ((serverurl (concat assistant/server-url assistant/talk-api)))
+		 (request
 
-		 :data  (json-encode (list (cons "model" model)
-								   (cons "prompt" prompt)))
-		 ;; :parser 'json-read
+		   serverurl
 
-		 :headers '(("Accept" . "application/json")
-					("Content-Type" . "application/json"))
+		   :type "POST"
 
-		 :success (cl-function
-				   (lambda (&key data &allow-other-keys)
-					 (with-current-buffer assistant/$codeBuffer
-					   (goto-char assistant/bufferpoint)
-					   (insert (assistant/json-get-response data))
-					   (read-only-mode nil))))
+		   :data  (json-encode (list (cons "model" model)
+									 (cons "prompt" prompt)))
+		   ;; :parser 'json-read
 
-		 :error (cl-function
-				 (lambda (&key error-thrown &allow-other-keys&rest _)
-				   (error "Error: %S" error-thrown)
-				   ))
+		   :headers '(("Accept" . "application/json")
+					  ("Content-Type" . "application/json"))
 
-		 :complete (lambda (&rest _) (message "Finished!"))
+		   :success (cl-function
+					 (lambda (&key data &allow-other-keys)
+					   (with-current-buffer assistant/$codeBuffer
+						 (goto-char assistant/bufferpoint)
+						 (insert (assistant/json-get-response data))
+						 (read-only-mode nil))))
 
-		 )
-	   nil)
+		   :error (cl-function
+				   (lambda (&key error-thrown &allow-other-keys&rest _)
+					 (error "Error: %S" error-thrown)
+					 ))
+
+		   :complete (lambda (&rest _) (message "Finished!"))
+
+		   )
+		 nil))
 
 (defun assistant/get-list-of-models () "List ollama models"
+	   (let ((serverurl (concat assistant/server-url assistant/list-api)))
+		 (request
+		   serverurl
+		   :type "GET"
 
-  (request
-	(concat assistant/server-url assistant/list-api)
-	:type "POST"
+		   :data  (json-encode (list (cons "model" model)
+									 (cons "prompt" prompt)))
+		   ;; :parser 'json-read
 
-	:data  (json-encode (list (cons "model" model)
-							  (cons "prompt" prompt)))
-	;; :parser 'json-read
+		   :headers '(("Accept" . "application/json")
+					  ("Content-Type" . "application/json"))
 
-	:headers '(("Accept" . "application/json")
-			   ("Content-Type" . "application/json"))
+		   :success (cl-function
+					 (lambda (&key data &allow-other-keys)
+					   (with-current-buffer assistant/$buffer
+						 (goto-char (point-max))
+						 ;; (insert (assistant/json-get-response data))
+						 (assistant/chat-window-scroll-to-bottom)
+						 )))
 
-	:success (cl-function
-			  (lambda (&key data &allow-other-keys)
-				(with-current-buffer assistant/$buffer
-				  (goto-char (point-max))
-				  ;; (insert (assistant/json-get-response data))
-				  (assistant/chat-window-scroll-to-bottom)
-				  )))
+		   :error (cl-function
+				   (lambda (&key error-thrown &allow-other-keys&rest _)
+					 (error "Error: %S" error-thrown)
+					 ))
 
-	:error (cl-function
-			(lambda (&key error-thrown &allow-other-keys&rest _)
-			  (error "Error: %S" error-thrown)
-			  ))
-
-	:complete (lambda (&rest _) (message "Finished!")))
-  nil)
+		   :complete (lambda (&rest _) (message "Finished!")))
+		 nil))
 
 (defun assistant/askchatbot () "Function to ask the chat bot"
 	   (interactive)
