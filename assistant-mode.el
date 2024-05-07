@@ -86,7 +86,8 @@
 
 (defun assistant/split-window () "Function to split window if there is no second window."
 	   (let ((otherwindow nil)
-			 (currentwindow nil))
+			 (currentwindow nil)
+			 (maxpos 0))
 		 (if (one-window-p) (split-window-right))
 
 		 (setq currentwindow (selected-window)
@@ -96,6 +97,7 @@
 		 (with-current-buffer assistant/$buffer
 		   ;; (erase-buffer)
 		   (markdown-mode)
+		   (setq maxpos (point-max))
 		   (goto-char (point-max))
 
 		   (set-window-point
@@ -104,6 +106,14 @@
 		   (linum-mode 0)
 		   (toggle-truncate-lines 0)
 		   )
+		 ))
+
+(defun assistant/chat-window-scroll-to-bottom () "Function to scroll the chat window to the bottom"
+	   (let ((chatwindow (get-buffer-window assistant/$buffer))
+			 (maxpos 0))
+		 (with-current-buffer assistant/$buffer
+		   (setq maxpos (point-max)))
+		 (set-window-point chatwindow maxpos)
 		 ))
 
 (defun assistant/json-get-response ( str ) "Get response from server and turn it to string"
@@ -146,7 +156,9 @@
 				   (lambda (&key data &allow-other-keys)
 					 (with-current-buffer assistant/$buffer
 					   (goto-char (point-max))
-					   (insert (assistant/json-get-response data)))))
+					   (insert (assistant/json-get-response data))
+					   (assistant/chat-window-scroll-to-bottom)
+					   )))
 
 		 :error (cl-function
 				 (lambda (&key error-thrown &allow-other-keys&rest _)
