@@ -68,7 +68,11 @@
   :type 'string
   :group 'assistant)
 
-(defcustom assistant/server-url "http://192.168.68.8:11434/api/generate" "The URL of the ollama."
+(defcustom assistant/server-url "http://192.168.68.8:11434/" "The URL of the ollama."
+  :type 'string
+  :group 'assistant)
+
+(defcustom assistant/talk-api "api/generate" "The path to talk api"
   :type 'string
   :group 'assistant)
 
@@ -207,7 +211,7 @@
 		 )
 	   nil)
 
-(defun assistant/get-list-of-models ()
+(defun assistant/get-list-of-models () "List ollama models"
 
   (request
 	assistant/server-url
