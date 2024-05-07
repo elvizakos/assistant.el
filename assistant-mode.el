@@ -33,6 +33,8 @@
 
 (defvar assistant/coding-models-list nil "List of coding models.")
 
+(defvar assistant/chat-models-list nil "List of chat models.")
+
 ;;---- OPTIONS --------------------------------------------------------------------
 (defgroup assistant nil "Assistant minor mode settings."
   :group 'tools)
