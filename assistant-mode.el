@@ -94,6 +94,14 @@
   :type 'string
   :group 'assistant)
 
+(defcustom assistant/save-conversation t "Save or not the conversation."
+  :type 'boolean
+  :group 'assistant)
+
+(defcustom assistant/conversation-path "~/.emacs.d/assistant/conversation" "Path to file to save the conversation"
+  :type 'string
+  :group 'assistant)
+
 ;;---- FUNCTIONS ------------------------------------------------------------------
 
 (defun assistant/split-window () "Function to split window if there is no second window."
