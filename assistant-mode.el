@@ -270,9 +270,10 @@
 			 assistant/bufferpoint (point))
 	   (let ((userinput (buffer-substring-no-properties 1 (point))))
 		 (with-current-buffer assistant/$codeBuffer
-		   (read-only-mode -1))
+		   ;;(read-only-mode -1)
+		   )
 		 (message "Wait . . .")
-		 (assistant/requestCode assistant/coding-model userinput)
+		 ;; (assistant/requestCode assistant/coding-model userinput)
 		 ))
 
 (defun assistant/change-chatbot () "Interactive function to change the chatbot in use."
