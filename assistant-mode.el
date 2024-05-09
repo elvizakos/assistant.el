@@ -226,19 +226,18 @@
 		   serverurl
 		   :type "GET"
 
-		   :data  (json-encode (list (cons "model" model)
-									 (cons "prompt" prompt)))
-		   ;; :parser 'json-read
-
-		   :headers '(("Accept" . "application/json")
-					  ("Content-Type" . "application/json"))
+		   :headers '(("Accept" . "application/json"))
 
 		   :success (cl-function
 					 (lambda (&key data &allow-other-keys)
-					   (with-current-buffer assistant/$buffer
-						 (goto-char (point-max))
-						 ;; (insert (assistant/json-get-response data))
-						 (assistant/chat-window-scroll-to-bottom)
+					   (let ((modeldata (json-parse-string data :object-type 'alist)))
+						 (setq assistant/models-list '())
+						 (if modeldata
+							 (progn
+							   (setq assistant/models-list (mapcar (lambda (item)
+																	 (cdr (assoc 'name item)) )
+																   (cdr (assoc 'models modeldata))))
+							   ))
 						 )))
 
 		   :error (cl-function
