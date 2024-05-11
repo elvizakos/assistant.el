@@ -104,6 +104,27 @@
 
 ;;---- FUNCTIONS ------------------------------------------------------------------
 
+(defun assistant/load-conversation ()
+  (if assistant/save-conversation
+	  (if (file-exists-p assistant/conversation-path)
+		  (progn
+			(setq assistant/$buffer (get-buffer-create assistant/buffer-name))
+			(with-current-buffer assistant/$buffer
+			  (insert-file-contents assistant/conversation-path)
+			  (rename-buffer assistant/buffer-name)
+			  (markdown-mode)
+			  (setq maxpos (point-max))
+			  (goto-char (point-max))
+
+			  (set-window-point
+			   (get-buffer-window (current-buffer) 'visible)
+			   (point-max))
+			  (linum-mode 0)
+			  (toggle-truncate-lines 0)
+
+			  ))))
+  )
+
 (defun assistant/save-conversation-buffer ()
   (if assistant/save-conversation
 	  (if (file-exists-p assistant/conversation-path)
@@ -114,6 +135,9 @@
 			 (currentwindow nil)
 			 (maxpos 0))
 		 (if (one-window-p) (split-window-right))
+
+		 (if (not (get-buffer assistant/buffer-name))
+			 (assistant/load-conversation))
 
 		 (setq currentwindow (selected-window)
 			   otherwindow (window-next-sibling)
