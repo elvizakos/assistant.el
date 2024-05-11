@@ -310,8 +310,10 @@
 				(if (file-exists-p assistant/conversation-path)
 					(progn
 
-					  (setq assistant/$buffer (find-file-noselect assistant/conversation-path))
+					  (setq assistant/$buffer (get-buffer-create assistant/buffer-name))
+					  ;; (setq assistant/$buffer (find-file-noselect assistant/conversation-path))
 					  (with-current-buffer assistant/$buffer
+						(insert-file-contents assistant/conversation-path)
 						(rename-buffer assistant/buffer-name)
 						;; (erase-buffer)
 						(markdown-mode)
