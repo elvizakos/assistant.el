@@ -104,6 +104,11 @@
 
 ;;---- FUNCTIONS ------------------------------------------------------------------
 
+(defun assistant/save-conversation-buffer ()
+  (if assistant/save-conversation
+	  (if (file-exists-p assistant/conversation-path)
+		  (write-file assistant/conversation-path n))))
+
 (defun assistant/split-window () "Function to split window if there is no second window."
 	   (let ((otherwindow nil)
 			 (currentwindow nil)
@@ -180,6 +185,7 @@
 						 (goto-char (point-max))
 						 (insert (assistant/json-get-response data))
 						 (assistant/chat-window-scroll-to-bottom)
+						 (assistant/save-conversation-buffer)
 						 )))
 
 		   :error (cl-function
@@ -216,6 +222,7 @@
 					   (with-current-buffer assistant/$codeBuffer
 						 (goto-char assistant/bufferpoint)
 						 (insert (assistant/json-get-response data))
+						 (assistant/save-conversation-buffer)
 						 (read-only-mode nil))))
 
 		   :error (cl-function
@@ -298,6 +305,26 @@
   :keymap (let ((assistantmap (make-sparse-keymap)))
 			(require 'request)
 			(require 'json)
+
+			(if assistant/save-conversation
+				(if (file-exists-p assistant/conversation-path)
+					(progn
+
+					  (setq assistant/$buffer (find-file-noselect assistant/conversation-path))
+					  (with-current-buffer assistant/$buffer
+						(rename-buffer assistant/buffer-name)
+						;; (erase-buffer)
+						(markdown-mode)
+						(setq maxpos (point-max))
+						(goto-char (point-max))
+
+						(set-window-point
+						 (get-buffer-window (current-buffer) 'visible)
+						 (point-max))
+						(linum-mode 0)
+						(toggle-truncate-lines 0)
+
+						))))
 
 			(assistant/get-list-of-models)
 			(setq assistant/coding-models-list '("codegemma:2b"
