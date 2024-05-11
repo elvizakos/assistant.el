@@ -128,7 +128,7 @@
 (defun assistant/save-conversation-buffer ()
   (if assistant/save-conversation
 	  (if (file-exists-p assistant/conversation-path)
-		  (write-file assistant/conversation-path t))))
+		  (write-file assistant/conversation-path nil))))
 
 (defun assistant/split-window () "Function to split window if there is no second window."
 	   (let ((otherwindow nil)
