@@ -1,4 +1,4 @@
-VERSION:=0.9.13
+VERSION:=$(shell git describe | head -n 1)
 PACKAGE_NAME:=assistant-mode-$(VERSION)
 PACKAGE_DIR:=/tmp/$(PACKAGE_NAME)
 
