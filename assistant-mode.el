@@ -111,6 +111,8 @@
 			(setq assistant/$buffer (get-buffer-create assistant/buffer-name))
 			(with-current-buffer assistant/$buffer
 			  (insert-file-contents assistant/conversation-path)
+			  (setq assistant/buffer-name (buffer-name))
+			  ;;(rename-buffer assistant/buffer-name)
 			  )))))
 
 (defun assistant/save-conversation-buffer ()
@@ -142,8 +144,8 @@
 			(point-max))
 		   (linum-mode 0)
 		   (toggle-truncate-lines 0)
-		   )
-		 ))
+		   ;;(rename-buffer assistant/buffer-name)
+		   )))
 
 (defun assistant/chat-window-scroll-to-bottom () "Function to scroll the chat window to the bottom"
 	   (let ((chatwindow (get-buffer-window assistant/$buffer))
@@ -196,8 +198,15 @@
 					   (with-current-buffer assistant/$buffer
 						 (goto-char (point-max))
 						 (insert (assistant/json-get-response data))
+
+
 						 (assistant/chat-window-scroll-to-bottom)
 						 (assistant/save-conversation-buffer)
+
+						 (setq assistant/buffer-name (buffer-name))
+						 (markdown-mode)
+						 (linum-mode 0)
+						 (toggle-truncate-lines 0)
 						 )))
 
 		   :error (cl-function
@@ -281,7 +290,11 @@
 	   (let ((userinput (read-string ">>> ")))
 		 (with-current-buffer assistant/$buffer
 		   (goto-char (point-max))
-		   (insert (format "\n\n------------------------------\n\n**YOU (%s)** - %s\n\n**%s (%s)** - " (format-time-string "%d-%m-%Y %H:%M:%S") userinput assistant/chat-model (format-time-string "%d-%m-%Y %H:%M:%S"))))
+		   (insert (format "\n\n------------------------------\n\n**YOU (%s)** - %s\n\n**%s (%s)** - " (format-time-string "%d-%m-%Y %H:%M:%S") userinput assistant/chat-model (format-time-string "%d-%m-%Y %H:%M:%S")))
+		   (markdown-mode)
+		   (linum-mode 0)
+		   (setq assistant/buffer-name (buffer-name))
+		   )
 		 (assistant/request assistant/chat-model userinput)
 		 ))
 
@@ -325,19 +338,20 @@
 					  (if (not (get-buffer assistant/buffer-name))
 						  (assistant/load-conversation))
 
-					  (setq assistant/$buffer (get-buffer-create assistant/buffer-name))
+					  ;; (setq assistant/$buffer (get-buffer-create assistant/buffer-name))
 					  ;; (setq assistant/$buffer (find-file-noselect assistant/conversation-path))
 					  (with-current-buffer assistant/$buffer
 						(insert-file-contents assistant/conversation-path)
-						(rename-buffer assistant/buffer-name)
+						(setq assistant/buffer-name (buffer-name))
+						;; (rename-buffer assistant/buffer-name)
 						;; (erase-buffer)
-						(markdown-mode)
 						(setq maxpos (point-max))
 						(goto-char (point-max))
 
 						(set-window-point
 						 (get-buffer-window (current-buffer) 'visible)
 						 (point-max))
+						(markdown-mode)
 						(linum-mode 0)
 						(toggle-truncate-lines 0)
 
