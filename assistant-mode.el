@@ -359,27 +359,28 @@
 
 			(assistant/get-list-of-models)
 			(setq assistant/coding-models-list '("codegemma:2b"
-												 "codegemma:7b"
-												 "codellama:7b"
-												 "starcoder2:3b"
 												 "starcoder2:7b"
 												 "starcoder2:latest"
 												 )
-				  assistant/chat-models-list '("gemma:2b"
-											   "gemma:7b"
-											   "llama2:7b"
-											   "llama2:latest"
-											   "llama2:text"
+				  assistant/chat-models-list '("deepseek-r1:1.5b"
+											   "llama3.2:3b"
+											   ;; "gemma:2b"
+											   ;; "gemma:7b"
+											   ;; "llama2:7b"
+											   ;; "llama2:latest"
+											   ;; "llama2:text"
 											   "llava:7b"
-											   "orca-mini:latest"
-											   "phi3:latest"
-											   "qwen:0.5b"
-											   "qwen:1.8b"
-											   "tinydolphin:latest"
-											   "tinyllama:latest"
-											   "yi:latest"
+											   ;; "orca-mini:latest"
+											   ;; "phi3:latest"
+											   ;; "qwen:0.5b"
+											   ;; "qwen:1.8b"
+											   ;; "tinydolphin:latest"
+											   ;; "tinyllama:latest"
+											   ;; "yi:latest"
+											   "qwen2:0.5b"
 											   )
 				  )
+
 
 			;; (setq assistant/$buffer (get-buffer-create assistant/buffer-name))
 			;; (setq assistant/$buffer (get-buffer-create assistant/buffer-name))
