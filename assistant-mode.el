@@ -64,6 +64,11 @@
   :group 'assistant
   )
 
+(defcustom assistant/assistant-toggle-buffer-keycomb "C-x c t" "Default key combination for toggling the chat buffer."
+  :type 'string
+  :group 'assistant
+  )
+
 (defcustom assistant/lighter " A" "Label of minor mode for the modeline."
   :type 'string
   :group 'assistant)
@@ -286,7 +291,7 @@
 
 (defun assistant/askchatbot () "Function to ask the chat bot"
 	   (interactive)
-	   (assistant/split-window)
+	   ;; (assistant/split-window)
 	   (let ((userinput (read-string ">>> ")))
 		 (with-current-buffer assistant/$buffer
 		   (goto-char (point-max))
