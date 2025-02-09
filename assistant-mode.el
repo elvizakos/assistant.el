@@ -35,6 +35,8 @@
 
 (defvar assistant/chat-models-list nil "List of chat models.")
 
+(defvar assistant/window-register nil "Buffer layout.")
+
 ;;---- OPTIONS --------------------------------------------------------------------
 (defgroup assistant nil "Assistant minor mode settings."
   :group 'tools)
@@ -161,26 +163,26 @@
 		 ))
 
 (defun assistant/json-get-response ( str ) "Get response from server and turn it to string"
-  (let ((ar (split-string str "\n"))
-		(i 0)
-		(itm "")
-		(res "")
-		(done nil)
-		(model "")
-		(ret "")
-		)
-	(while (< i (+ 1 (length ar)))
-	  (if (and (string= (type-of (nth i ar)) "string") (> (length (nth i ar)) 0) (string= (substring (nth i ar) 0 1) "{"))
-		  (setq itm (json-parse-string (nth i ar))
-				model (gethash "model" itm)
-				res (gethash "response" itm)
-				done (gethash "done" itm))
-		)
-	  (setq i (1+ i)
-			ret (concat ret res))
-	  )
-	;; (concat model " - " ret)
-	ret ))
+	   (let ((ar (split-string str "\n"))
+			 (i 0)
+			 (itm "")
+			 (res "")
+			 (done nil)
+			 (model "")
+			 (ret "")
+			 )
+		 (while (< i (+ 1 (length ar)))
+		   (if (and (string= (type-of (nth i ar)) "string") (> (length (nth i ar)) 0) (string= (substring (nth i ar) 0 1) "{"))
+			   (setq itm (json-parse-string (nth i ar))
+					 model (gethash "model" itm)
+					 res (gethash "response" itm)
+					 done (gethash "done" itm))
+			 )
+		   (setq i (1+ i)
+				 ret (concat ret res))
+		   )
+		 ;; (concat model " - " ret)
+		 ret ))
 
 (defun assistant/request ( model prompt ) "Function to get response "
 	   (let ((serverurl (concat assistant/server-url assistant/talk-api)))
@@ -298,7 +300,7 @@
 		   (insert (format "\n\n------------------------------\n\n**YOU (%s)** - %s\n\n**%s (%s)** - " (format-time-string "%d-%m-%Y %H:%M:%S") userinput assistant/chat-model (format-time-string "%d-%m-%Y %H:%M:%S")))
 		   (markdown-mode)
 		   (linum-mode 0)
-		   (setq assistant/buffer-name (buffer-name))
+		   ;; (setq assistant/buffer-name (buffer-name))
 		   )
 		 (assistant/request assistant/chat-model userinput)
 		 ))
@@ -328,6 +330,12 @@
 (defun assistant/change-coder () "Interactive function to change the coder ai in use."
 	   (interactive)
 	   (setq assistant/coding-model (ido-completing-read "Select name of the AI: " assistant/models-list)))
+
+(defun assistant/toggle-buffer () ""
+	   (interactive)
+
+	   (assistant/split-window)
+	   )
 
 ;;---- MINOR MODE ------------------------------------------------------------------
 (define-minor-mode assistant-mode "Assistant minor mode."
@@ -362,29 +370,31 @@
 
 						))))
 
+			(setq assistant/coding-models-list '()
+				  assistant/chat-models-list '())
 			(assistant/get-list-of-models)
-			(setq assistant/coding-models-list '("codegemma:2b"
-												 "starcoder2:7b"
-												 "starcoder2:latest"
-												 )
-				  assistant/chat-models-list '("deepseek-r1:1.5b"
-											   "llama3.2:3b"
-											   ;; "gemma:2b"
-											   ;; "gemma:7b"
-											   ;; "llama2:7b"
-											   ;; "llama2:latest"
-											   ;; "llama2:text"
-											   "llava:7b"
-											   ;; "orca-mini:latest"
-											   ;; "phi3:latest"
-											   ;; "qwen:0.5b"
-											   ;; "qwen:1.8b"
-											   ;; "tinydolphin:latest"
-											   ;; "tinyllama:latest"
-											   ;; "yi:latest"
-											   "qwen2:0.5b"
-											   )
-				  )
+			;; (setq assistant/coding-models-list '("codegemma:2b"
+			;; 									 "starcoder2:7b"
+			;; 									 "starcoder2:latest"
+			;; 									 )
+			;; 	  assistant/chat-models-list '("deepseek-r1:1.5b"
+			;; 								   "llama3.2:3b"
+			;; 								   ;; "gemma:2b"
+			;; 								   ;; "gemma:7b"
+			;; 								   ;; "llama2:7b"
+			;; 								   ;; "llama2:latest"
+			;; 								   ;; "llama2:text"
+			;; 								   "llava:7b"
+			;; 								   ;; "orca-mini:latest"
+			;; 								   ;; "phi3:latest"
+			;; 								   ;; "qwen:0.5b"
+			;; 								   ;; "qwen:1.8b"
+			;; 								   ;; "tinydolphin:latest"
+			;; 								   ;; "tinyllama:latest"
+			;; 								   ;; "yi:latest"
+			;; 								   "qwen2:0.5b"
+			;; 								   )
+			;; 	  )
 
 
 			;; (setq assistant/$buffer (get-buffer-create assistant/buffer-name))
@@ -419,6 +429,8 @@
 			(define-key assistant/assistant-keymap (kbd assistant/assistant-change-chat-model-keycomb) 'assistant/change-chatbot)
 
 			(define-key assistant/assistant-keymap (kbd assistant/assistant-change-coding-model-keycomb) 'assistant/change-coder)
+
+			(define-key assistant/assistant-keymap (kbd assistant/assistant-toggle-buffer-keycomb) 'assistant/toggle-buffer)
 
 			assistant/assistant-keymap)
   :global 1
