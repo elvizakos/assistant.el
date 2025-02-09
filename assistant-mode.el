@@ -331,11 +331,17 @@
 	   (interactive)
 	   (setq assistant/coding-model (ido-completing-read "Select name of the AI: " assistant/models-list)))
 
-(defun assistant/toggle-buffer () ""
+(defun assistant/toggle-buffer () "Interactive function for toggling the chat window."
 	   (interactive)
-
-	   (assistant/split-window)
-	   )
+	   (let ((is-visible (get-buffer-window assistant/$buffer)))
+		 (if is-visible
+			 (register-to-window-configuration assistant/window-register)
+		   (progn
+			 (window-configuration-to-register assistant/window-register)
+			 (delete-other-windows)
+			 (split-window-vertically)
+			 ))
+		 ))
 
 ;;---- MINOR MODE ------------------------------------------------------------------
 (define-minor-mode assistant-mode "Assistant minor mode."
