@@ -66,7 +66,7 @@
   :group 'assistant
   )
 
-(defcustom assistant/assistant-toggle-buffer-keycomb "C-x c t" "Default key combination for toggling the chat buffer."
+(defcustom assistant/assistant-toggle-buffer-keycomb "C-x / t" "Default key combination for toggling the chat buffer."
   :type 'string
   :group 'assistant
   )
@@ -339,7 +339,8 @@
 		   (progn
 			 (window-configuration-to-register assistant/window-register)
 			 (delete-other-windows)
-			 (split-window-vertically)
+			 (split-window-horizontally)
+			 (switch-to-buffer-other-window assistant/$buffer)
 			 ))
 		 ))
 
