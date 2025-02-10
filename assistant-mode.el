@@ -187,8 +187,10 @@
 		 ret ))
 
 (defun assistant/request ( model prompt ) "Function to get response "
-	   (let ((serverurl (concat assistant/server-url assistant/talk-api)))
+	   (let ((serverurl (concat assistant/server-url assistant/talk-api))
+			 (cpos 0))
 		 (1+ assistant/pending-responses)
+		 (setcar (cdr (assq 'assistant minor-mode-alist)) (propertize assistant/lighter 'face '(:foreground "#FF0000")))
 		 (request
 
 		   serverurl
@@ -206,8 +208,8 @@
 					 (lambda (&key data &allow-other-keys)
 					   (with-current-buffer assistant/$buffer
 						 (goto-char (point-max))
+						 (setq cpos (point))
 						 (insert (assistant/json-get-response data))
-
 
 						 (assistant/chat-window-scroll-to-bottom)
 						 (assistant/save-conversation-buffer)
@@ -216,6 +218,8 @@
 						 (markdown-mode)
 						 (linum-mode 0)
 						 (toggle-truncate-lines 0)
+
+						 (goto-char cpos)
 						 )))
 
 		   :error (cl-function
@@ -224,7 +228,7 @@
 					 ))
 
 		   :complete (lambda (&rest _)
-					   (1- assistant/pending-responses)
+					   (setcar (cdr (assq 'assistant minor-mode-alist)) (propertize assistant/lighter 'face '(:foreground "#00FF00")))
 					   (message "Finished!"))
 
 		   ;; :status-code '((400 . (lambda (&rest _) (message "Got 400")))
@@ -349,15 +353,15 @@
 			 ))
 		 ))
 
-(defun assistant/lighter-control () ""
-	   (if (> assistant/pending-responses 0)
-		   (concat assistant/lighter "+")
-		 assistant/lighter
-		 ))
+;; (defun assistant/lighter-control () ""
+;; 	   (if (> assistant/pending-responses 0)
+;; 		   (propertize (concat assistant/lighter "+") 'face :foreground "#FF0000")
+;; 		 assistant/lighter
+;; 		 ))
 
 ;;---- MINOR MODE ------------------------------------------------------------------
 (define-minor-mode assistant-mode "Assistant minor mode."
-  :lighter (:eval (assistant/lighter-control))
+  :lighter assistant/lighter
   :keymap (let ((assistantmap (make-sparse-keymap)))
 			(require 'request)
 			(require 'json)
