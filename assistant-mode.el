@@ -348,8 +348,11 @@
 		 ))
 
 (defun assistant/lighter-control () ""
-	   assistant/lighter
-	   )
+	   (if (> assistant/pending-responses 0)
+		   (concat assistant/lighter "+")
+		 assistant/lighter
+		 ))
+
 ;;---- MINOR MODE ------------------------------------------------------------------
 (define-minor-mode assistant-mode "Assistant minor mode."
   :lighter (:eval (assistant/lighter-control))
