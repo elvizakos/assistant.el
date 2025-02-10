@@ -37,6 +37,8 @@
 
 (defvar assistant/window-register nil "Buffer layout.")
 
+(defvar assistant/pending-responses 0 "Variable for setting if there are pending responses.")
+
 ;;---- OPTIONS --------------------------------------------------------------------
 (defgroup assistant nil "Assistant minor mode settings."
   :group 'tools)
@@ -345,9 +347,12 @@
 			 ))
 		 ))
 
+(defun assistant/lighter-control () ""
+	   assistant/lighter
+	   )
 ;;---- MINOR MODE ------------------------------------------------------------------
 (define-minor-mode assistant-mode "Assistant minor mode."
-  :lighter assistant/lighter
+  :lighter (:eval (assistant/lighter-control))
   :keymap (let ((assistantmap (make-sparse-keymap)))
 			(require 'request)
 			(require 'json)
