@@ -41,6 +41,12 @@
 
 (defvar assistant/--lighter " A" "Variable for setting the string and text properties of the lighter.")
 
+
+;;---- FACES ----------------------------------------------------------------------
+(defface assistant/pending-requests-face '((t (:foreground "red" :weight bold))) "Face for pending requests.")
+
+(defface assistant/done-requests-face '((t (:foreground "green" :weight bold))) "Face for done all requests.")
+
 ;;---- OPTIONS --------------------------------------------------------------------
 (defgroup assistant nil "Assistant minor mode settings."
   :group 'tools)
@@ -365,9 +371,12 @@
 	   (if (> assistant/pending-responses 0)
 		   (assistant/set-lighter-color "red")
 		 (assistant/set-lighter-color "green")
-		 ))
+		 )
+	   (force-mode-line-update)
+	   )
 
 (setq assistant/--lighter assistant/lighter)
+(assistant/set-lighter-color "green")
 
 ;;---- MINOR MODE ------------------------------------------------------------------
 (define-minor-mode assistant-mode "Assistant minor mode."
