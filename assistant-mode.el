@@ -39,6 +39,8 @@
 
 (defvar assistant/pending-responses 0 "Variable for setting if there are pending responses.")
 
+(defvar assistant/--lighter " A" "Variable for setting the string and text properties of the lighter.")
+
 ;;---- OPTIONS --------------------------------------------------------------------
 (defgroup assistant nil "Assistant minor mode settings."
   :group 'tools)
@@ -190,7 +192,7 @@
 	   (let ((serverurl (concat assistant/server-url assistant/talk-api))
 			 (cpos 0))
 		 (1+ assistant/pending-responses)
-		 (setcar (cdr (assq 'assistant minor-mode-alist)) (propertize assistant/lighter 'face '(:foreground "#FF0000")))
+		 (assistant/update-lighter)
 		 (request
 
 		   serverurl
@@ -228,7 +230,8 @@
 					 ))
 
 		   :complete (lambda (&rest _)
-					   (setcar (cdr (assq 'assistant minor-mode-alist)) (propertize assistant/lighter 'face '(:foreground "#00FF00")))
+					   (1- assistant/pending-responses)
+					   (assistant/update-lighter)
 					   (message "Finished!"))
 
 		   ;; :status-code '((400 . (lambda (&rest _) (message "Got 400")))
@@ -353,15 +356,22 @@
 			 ))
 		 ))
 
-;; (defun assistant/lighter-control () ""
-;; 	   (if (> assistant/pending-responses 0)
-;; 		   (propertize (concat assistant/lighter "+") 'face :foreground "#FF0000")
-;; 		 assistant/lighter
-;; 		 ))
+(defun assistant/set-lighter-color (color) "Changes the color of the lighter string."
+	   (setq assistant/--lighter (propertize assistant/lighter 'face `(:foreground ,color)))
+	   (force-mode-line-update))
+
+(defun assistant/update-lighter () ""
+	   (interactive)
+	   (if (> assistant/pending-responses 0)
+		   (assistant/set-lighter-color "red")
+		 (assistant/set-lighter-color "green")
+		 ))
+
+(setq assistant/--lighter assistant/lighter)
 
 ;;---- MINOR MODE ------------------------------------------------------------------
 (define-minor-mode assistant-mode "Assistant minor mode."
-  :lighter assistant/lighter
+  :lighter assistant/--lighter
   :keymap (let ((assistantmap (make-sparse-keymap)))
 			(require 'request)
 			(require 'json)
