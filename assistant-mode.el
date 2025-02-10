@@ -188,7 +188,7 @@
 
 (defun assistant/request ( model prompt ) "Function to get response "
 	   (let ((serverurl (concat assistant/server-url assistant/talk-api)))
-
+		 (1+ assistant/pending-responses)
 		 (request
 
 		   serverurl
@@ -223,7 +223,9 @@
 					 (error "Error: %S" error-thrown)
 					 ))
 
-		   :complete (lambda (&rest _) (message "Finished!"))
+		   :complete (lambda (&rest _)
+					   (1- assistant/pending-responses)
+					   (message "Finished!"))
 
 		   ;; :status-code '((400 . (lambda (&rest _) (message "Got 400")))
 		   ;; 				(418 . (lambda (&rest _) (message "Got 418")))
