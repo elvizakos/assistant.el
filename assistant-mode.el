@@ -335,12 +335,10 @@
 	   (interactive)
 	   (let ((is-visible (get-buffer-window assistant/$buffer)))
 		 (if is-visible
-			 ;; (set-window-configuration assistant/window-register)
-			 ;;(register-to-window-configuration assistant/window-register)
+
 			 (jump-to-register assistant/window-register)
 		   (progn
 			 (window-configuration-to-register assistant/window-register)
-			 ;; (set-register assistant/window-register (list (current-window-configuration) nil))
 			 (delete-other-windows)
 			 (split-window-horizontally)
 			 (switch-to-buffer-other-window assistant/$buffer)
