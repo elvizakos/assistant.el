@@ -13,6 +13,18 @@
 
 ;;; Code:
 
+;;---- FACES ----------------------------------------------------------------------
+
+(defface assistant/pending-requests-face
+  '((t :foreground "red" :weight bold))
+  "Face for pending requests."
+  :group 'assistant)
+
+(defface assistant/done-requests-face
+  '((t :foreground "green" :weight normal))
+  "Face for done all requests."
+  :group 'assistant)
+
 ;;---- CONSTANTS ------------------------------------------------------------------
 (defconst assistant/assistant-version "%%VERSION%%" "Assistant version.")
 
@@ -39,13 +51,11 @@
 
 (defvar assistant/pending-responses 0 "Variable for setting if there are pending responses.")
 
-(defvar assistant/--lighter " A" "Variable for setting the string and text properties of the lighter.")
+(defvar assistant/pending-requests-face 'assistant/pending-requests-face "")
+(defvar assistant/done-requests-face 'assistant/done-requests-face "")
 
+(defvar assistant/--lighter (propertize " A" 'face 'assistant/done-requests-face) "Variable for setting the string and text properties of the lighter.")
 
-;;---- FACES ----------------------------------------------------------------------
-(defface assistant/pending-requests-face '((t (:foreground "red" :weight bold))) "Face for pending requests.")
-
-(defface assistant/done-requests-face '((t (:foreground "green" :weight bold))) "Face for done all requests.")
 
 ;;---- OPTIONS --------------------------------------------------------------------
 (defgroup assistant nil "Assistant minor mode settings."
@@ -197,7 +207,7 @@
 (defun assistant/request ( model prompt ) "Function to get response "
 	   (let ((serverurl (concat assistant/server-url assistant/talk-api))
 			 (cpos 0))
-		 (1+ assistant/pending-responses)
+		 (setq assistant/pending-responses (1+ assistant/pending-responses))
 		 (assistant/update-lighter)
 		 (request
 
@@ -236,7 +246,7 @@
 					 ))
 
 		   :complete (lambda (&rest _)
-					   (1- assistant/pending-responses)
+					   (setq assistant/pending-responses (1- assistant/pending-responses))
 					   (assistant/update-lighter)
 					   (message "Finished!"))
 
@@ -311,7 +321,7 @@
 (defun assistant/askchatbot () "Function to ask the chat bot"
 	   (interactive)
 	   ;; (assistant/split-window)
-	   (let ((userinput (read-string ">>> ")))
+	   (let ((userinput (read-string (concat assistant/chat-model ": "))))
 		 (with-current-buffer assistant/$buffer
 		   (goto-char (point-max))
 		   (insert (format "\n\n------------------------------\n\n**YOU (%s)** - %s\n\n**%s (%s)** - " (format-time-string "%d-%m-%Y %H:%M:%S") userinput assistant/chat-model (format-time-string "%d-%m-%Y %H:%M:%S")))
@@ -362,21 +372,15 @@
 			 ))
 		 ))
 
-(defun assistant/set-lighter-color (color) "Changes the color of the lighter string."
-	   (setq assistant/--lighter (propertize assistant/lighter 'face `(:foreground ,color)))
-	   (force-mode-line-update))
+(defun assistant/set-lighter-color (text color) "Changes the color of the lighter string."
+	   (setq assistant/--lighter (propertize text 'face `(:foreground ,color)))
+	   (force-mode-line-update t))
 
 (defun assistant/update-lighter () ""
 	   (interactive)
 	   (if (> assistant/pending-responses 0)
-		   (assistant/set-lighter-color "red")
-		 (assistant/set-lighter-color "green")
-		 )
-	   (force-mode-line-update)
-	   )
-
-(setq assistant/--lighter assistant/lighter)
-(assistant/set-lighter-color "green")
+		   (assistant/set-lighter-color " A+" "#FF0000")
+		 (assistant/set-lighter-color " A" "#00FF00")))
 
 ;;---- MINOR MODE ------------------------------------------------------------------
 (define-minor-mode assistant-mode "Assistant minor mode."
