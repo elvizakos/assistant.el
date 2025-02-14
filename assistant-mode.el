@@ -37,6 +37,8 @@
 
 (defvar assistant/$buffer nil "The assistant's buffer.")
 
+(defvar assistant/$buffer-gemini nil "The assistant's buffer for google's gemini.")
+
 (defvar assistant/$codeBuffer nil "The buffer to use for writing code")
 
 (defvar assistant/bufferpoint 0 "The last position of cursor.")
@@ -242,8 +244,7 @@
 
 		   :error (cl-function
 				   (lambda (&key error-thrown &allow-other-keys&rest _)
-					 (error "Error: %S" error-thrown)
-					 ))
+					 (error "Error: %S" error-thrown)))
 
 		   :complete (lambda (&rest _)
 					   (setq assistant/pending-responses (1- assistant/pending-responses))
@@ -254,6 +255,44 @@
 		   ;; 				(418 . (lambda (&rest _) (message "Got 418")))
 		   ;; 				(200 . (lambda (&rest _) (message "Got 200")))
 		   ;; 				)
+		   )
+		 nil))
+
+(defun assistant/request-gemini ( prompt ) "Function to work with Google's Gemini api"
+	   (let ((serverurl (replace-regexp-in-string (regexp-quote "%%API-KEY%%") assistant/gemini-api-key assistant/server-url-gemini nil t))
+			 (cpos 0))
+
+		 (setq assistant/pending-responses (1+ assistant/pending-responses))
+		 (request
+
+		   serverurl
+
+		   :type "POST"
+
+		   :headers '(("Accept" . "application/json")
+					  ("Content-Type" . "application/json"))
+
+		   :data (json-encode (list (cons "contents" (list (list (cons "parts" (list (list (cons "text" prompt)))))))))
+
+		   :success (cl-function
+					 (lambda (&key data &allow-other-keys)
+					   (with-current-buffer assistant/$buffer-gemini
+						 (goto-char (point-max))
+						 (setq cpos (point))
+						 (insert (format "%S" data))
+						 ;;;;;
+						 ;;;;; 
+						 ;;;;;
+						 )))
+
+		   :error (cl-function
+				   (lambda ($key error-thrown &allow-other-key&rest _)
+					 (error "Error: %S" error-thrown)))
+
+		   :complete (lambda ($rest _)
+					   (setq assistant/pending-responses (1- assistant/pending-responses))
+					   (assistant/update-lighter)
+					   (message "Finished!"))
 		   )
 		 nil))
 
