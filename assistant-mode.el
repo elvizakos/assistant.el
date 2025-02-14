@@ -63,6 +63,9 @@
 (defgroup assistant nil "Assistant minor mode settings."
   :group 'tools)
 
+(defgroup assistant/gemini nil "Settings for Google's Gemini for use with the Assistant minor mode."
+  :group 'assistant)
+
 (defcustom assistant/assistant-ask-chatbot-keycomb "C-x / ?" "Default key combination for asking the chat bot."
   :type 'string
   :group 'assistant
@@ -100,6 +103,19 @@
 (defcustom assistant/server-url "http://192.168.68.8:11434/" "The URL of the ollama."
   :type 'string
   :group 'assistant)
+
+(defcustom assistant/server-url-gemini "https://generativelanguage.googleapis.com/v1beta/models/%%MODEL%%:generateContent?key=%%API-KEY%%" "The URL of the google's gemini"
+  :type 'string
+  :group 'assistant/gemini)
+
+(defcustom assistant/gemini-api-key "" "The API key for the Google's Gemini"
+  :type 'string
+  :group assistant/gemini)
+
+(defcustom assistant/gemini-model "gemini-1.5-flash" "The selected Google's Gemini model."
+  :type 'string
+  :group 'assistant/gemini
+  )
 
 (defcustom assistant/talk-api "api/generate" "The path to talk api"
   :type 'string
@@ -259,7 +275,7 @@
 		 nil))
 
 (defun assistant/request-gemini ( prompt ) "Function to work with Google's Gemini api"
-	   (let ((serverurl (replace-regexp-in-string (regexp-quote "%%API-KEY%%") assistant/gemini-api-key assistant/server-url-gemini nil t))
+	   (let ((serverurl (replace-regexp-in-string (regexp-quote "%%API-KEY%%") assistant/gemini-api-key (replace-regexp-in-string (regexp-quote assistant/gemini-model) "%%MODEL%%" assistant/server-url-gemini nil t) nil t))
 			 (cpos 0))
 
 		 (setq assistant/pending-responses (1+ assistant/pending-responses))
