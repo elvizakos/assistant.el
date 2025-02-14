@@ -1,5 +1,5 @@
-./tests.el
-./setver
-./assistant.sh
-./tests
-./tests/
+tests.el
+setver
+assistant.sh
+tests
+tests/
