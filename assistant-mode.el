@@ -29,7 +29,7 @@
 
 (defvar assistant/pending-responses 0 "Variable for defining the number of pending requrests.")
 
-(defvar assistant/--lighter (propertize " A" 'face 'assistant/done-requests-face) "Variable for setting the string and text properties of the lighter.")
+(defvar assistant/--lighter " A" "Variable for setting the string and text properties of the lighter.")
 
 (defvar assistant/db-history nil "Database object.")
 
@@ -472,43 +472,37 @@ until-date " ORDER BY msg.datetime DESC LIMIT 0," max-messages "
 
 ;; ---- Lighter functions
 (defun assistant/update-lighter () "Update the mode's lighter based on the status of the pending requests."
-			   (interactive)
-			   (if (> assistant/pending-responses 0)
-				   ;; Pending requests
-				   (setq minor-mode-alist
-				 (cons '(assistant-mode
-						 (:eval (concat (propertize assistant/lighter
-													'face
-													`(:background ,assistant/lighter-busy-color :weight bold))
-										;; " "
-										;; (propertize (concat "(" (number-to-string assistant/pending-responses) ")")
-										;; 			'face
-										;; 			'((:foreground "blue" :weight normal :height 0.4)
-										;; 			  default))
-										)
-								))
-					   (assq-delete-all 'assistant-mode minor-mode-alist)))
-		 ;; Ready
-		 (setq minor-mode-alist
-			   (cons '(assistant-mode
-					   (:eval (concat (propertize assistant/lighter
-												  'face
-												  `(:background ,assistant/lighter-ready-color :weight normal))
-									  ;; " "
-									  ;; (propertize (concat "(" (number-to-string assistant/pending-responses) ")")
-									  ;; 			  'face
-									  ;; 			  '((:foreground "blue" :weight normal :height 0.4)
-									  ;; 				default))
-									  )
-							  ))
-					 (assq-delete-all 'assistant-mode minor-mode-alist)))))
+	   (interactive)
+	   (if nil 
+		   (if (> assistant/pending-responses 0)
+			   ;; Pending requests
+			   (setq minor-mode-alist
+					 (cons '(assistant-mode
+							 (:eval (concat (propertize assistant/lighter
+														'face
+														`(:background ,assistant/lighter-busy-color :weight bold))
+											)
+									))
+						   (assq-delete-all 'assistant-mode minor-mode-alist)))
+			 ;; Ready
+			 (setq minor-mode-alist
+				   (cons '(assistant-mode
+						   (:eval (concat (propertize assistant/lighter
+													  'face
+													  `(:background ,assistant/lighter-ready-color :weight normal))
+										  )
+								  ))
+						 (assq-delete-all 'assistant-mode minor-mode-alist))))))
 
 ;; ---- Chat buffer and window functions
 (defun assistant/--build-buffer () "Function to build the chat buffer."
 	   (setq assistant/$buffer (get-buffer-create assistant/buffer-name))
 	   (with-current-buffer assistant/$buffer
 		 (rename-buffer assistant/buffer-name)
-		 (if (commandp 'linum-mode) (linum-mode 0) (line-number-mode 0))
+		 ;; (if (commandp 'linum-mode) (linum-mode 0) (line-number-mode 0))
+		 (cond
+		  ((fboundp 'display-line-numbers-mode) (display-line-numbers-mode 0))
+		  ((fboundp 'linum-mode) (linum-mode 0)))
 		 (markdown-mode)
 		 (toggle-truncate-lines 0))
 	   assistant/$buffer)
@@ -641,26 +635,34 @@ until-date " ORDER BY msg.datetime DESC LIMIT 0," max-messages "
 ;; Load the plugins
 (setq assistant/load-path (file-name-as-directory (directory-file-name (file-name-directory (or load-file-name buffer-file-name)))))
 (setq assistant/load-ollama t)
-(setq assistant/load-openwebui t)
+(setq assistant/load-openwebui nil)
 (setq assistant/load-lmstudio nil)
-(if assistant/load-ollama (load (concat assistant/load-path "assistant-ollama.el")))
-(if assistant/load-openwebui (load (concat assistant/load-path "assistant-openwebui.el")))
+(if (and assistant/load-ollama (file-exists-p (concat assistant/load-path "assistant-ollama.el")))
+	(progn
+	  ;; (require 'assistant-ollama)
+	  (load (concat assistant/load-path "assistant-ollama.el"))))
+(if (and assistant/load-openwebui (file-exists-p (concat assistant/load-path "assistant-openwebui.el")))
+	(progn
+	  ;; (require 'assistant-openwebui)
+	  (load (concat assistant/load-path "assistant-openwebui.el"))))
 (if assistant/load-lmstudio (progn
-							  (load (concat assistant/load-path "assistant-lmstudio-openai-v1.el"))
-							  (load (concat assistant/load-path "assistant-lmstudio-v0.el"))
-							  (load (concat assistant/load-path "assistant-lmstudio-v1.el"))
+							  ;; (require 'assistant-lmstudio)
+							  (if (file-exists-p (concat assistant/load-path "assistant-lmstudio-openai.v1.el"))
+								  (load (concat assistant/load-path "assistant-lmstudio-openai-v1.el")))
+							  (if (file-exists-p (concat assistant/load-path "assistant-lmstudio-v0.el"))
+								  (load (concat assistant/load-path "assistant-lmstudio-v0.el")))
+							  (if (file-exists-p (concat assistant/load-path "assistant-lmstudio-v1.el"))
+								  (load (concat assistant/load-path "assistant-lmstudio-v1.el")))
 							  ))
 
 ;;---- MINOR MODE ------------------------------------------------------------------
 ;;;###autoload
 (define-minor-mode assistant-mode "Assistant minor mode."
   :lighter assistant/--lighter
+  :global 1
   :keymap (let ((assistantmap (make-sparse-keymap)))
 			(require 'request)
 			(require 'json)
-			(require 'assistant-ollama)
-			(require 'assistant-openwebui)
-			;; (require 'assistant-lmstudio)
 
 			;; Set database object
 			(if (not (file-exists-p (concat assistant/history-path "/db.sqlite3")))
@@ -745,12 +747,9 @@ until-date " ORDER BY msg.datetime DESC LIMIT 0," max-messages "
 
 			(define-key assistant/assistant-keymap (kbd assistant/assistant-toggle-buffer-keycomb) 'assistant/toggle-chat-buffer)
 
-			assistant/assistant-keymap)
+			assistant/assistant-keymap))
 
-  :global 1
-
-  )
-
+;;;###autoload
 (assistant-mode 1)
 
 (provide 'assistant-mode)
