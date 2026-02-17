@@ -14,6 +14,7 @@ $(PACKAGE_DIR):
 	mv $@/"~tmp~" $@/assistant-mode-pkg.el
 	sed -re 's/%%VERSION%%/'"$(VERSION)"'/g' $@/assistant-mode.el > $@/"~tmp~"
 	sed -re 's/\(defconst assistant-version \"%%VERSION%%\"/\(defconst assistant-version "'"$(VERSION)"'"/g' $@/"~tmp~" > $@/assistant-mode.el
+	emacs -batch -f batch-byte-compile $@/assistant-mode.el # Byte compile el
 	rm $@/"~tmp~"
 
 install:
