@@ -652,6 +652,7 @@ until-date " ORDER BY msg.datetime DESC LIMIT 0," max-messages "
 							  ))
 
 ;;---- MINOR MODE ------------------------------------------------------------------
+;;;###autoload
 (define-minor-mode assistant-mode "Assistant minor mode."
   :lighter assistant/--lighter
   :keymap (let ((assistantmap (make-sparse-keymap)))
