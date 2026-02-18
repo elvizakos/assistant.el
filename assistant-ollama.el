@@ -6,7 +6,7 @@
 
 (defun assistant/--get-list-of-models-ollama ( data ) "Analyze the ollama api json and get the list of models."
 	   (mapcar (lambda (item) "Walk through models array"
-				 (let ((model-name (cdr  (assoc 'name item))))
+				 (let ((model-name (cdr (assoc 'name item))))
 				   (assistant/--db-add-model-to-db (nth 0 assistant/with-current-api) model-name)
 				   (list :model model-name :api-n assistant/with-current-api-n)))
 				 (cdr (assoc 'models data))))
