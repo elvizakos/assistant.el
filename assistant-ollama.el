@@ -1,4 +1,4 @@
-(defun assistant/-ollama-api-points () "Returns the URL API points for ollama"
+(defun assistant/-ollama-api-points () "Returns the available URL API points for ollama"
 		   (list "api/generate"
 			 "api/chat"
 			 "api/tags"
