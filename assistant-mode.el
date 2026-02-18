@@ -473,26 +473,25 @@ until-date " ORDER BY msg.datetime DESC LIMIT 0," max-messages "
 ;; ---- Lighter functions
 (defun assistant/update-lighter () "Update the mode's lighter based on the status of the pending requests."
 	   (interactive)
-	   (if nil 
-		   (if (> assistant/pending-responses 0)
-			   ;; Pending requests
-			   (setq minor-mode-alist
-					 (cons '(assistant-mode
-							 (:eval (concat (propertize assistant/lighter
-														'face
-														`(:background ,assistant/lighter-busy-color :weight bold))
-											)
-									))
-						   (assq-delete-all 'assistant-mode minor-mode-alist)))
-			 ;; Ready
-			 (setq minor-mode-alist
-				   (cons '(assistant-mode
-						   (:eval (concat (propertize assistant/lighter
-													  'face
-													  `(:background ,assistant/lighter-ready-color :weight normal))
-										  )
-								  ))
-						 (assq-delete-all 'assistant-mode minor-mode-alist))))))
+	   (if (> assistant/pending-responses 0)
+		   ;; Pending requests
+		   (setq minor-mode-alist
+				 (cons '(assistant-mode
+						 (:eval (concat (propertize assistant/lighter
+													'face
+													`(:background ,assistant/lighter-busy-color :weight bold))
+										)
+								))
+					   (assq-delete-all 'assistant-mode minor-mode-alist)))
+		 ;; Ready
+		 (setq minor-mode-alist
+			   (cons '(assistant-mode
+					   (:eval (concat (propertize assistant/lighter
+												  'face
+												  `(:background ,assistant/lighter-ready-color :weight normal))
+									  )
+							  ))
+					 (assq-delete-all 'assistant-mode minor-mode-alist)))))
 
 ;; ---- Chat buffer and window functions
 (defun assistant/--build-buffer () "Function to build the chat buffer."
