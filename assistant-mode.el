@@ -498,10 +498,8 @@ until-date " ORDER BY msg.datetime DESC LIMIT 0," max-messages "
 	   (setq assistant/$buffer (get-buffer-create assistant/buffer-name))
 	   (with-current-buffer assistant/$buffer
 		 (rename-buffer assistant/buffer-name)
-		 ;; (if (commandp 'linum-mode) (linum-mode 0) (line-number-mode 0))
-		 (cond
-		  ((fboundp 'display-line-numbers-mode) (display-line-numbers-mode 0))
-		  ((fboundp 'linum-mode) (linum-mode 0)))
+		 (cond ((fboundp 'display-line-numbers-mode) (display-line-numbers-mode 0))
+			   ((fboundp 'linum-mode) (linum-mode 0)))
 		 (markdown-mode)
 		 (toggle-truncate-lines 0))
 	   assistant/$buffer)
@@ -709,8 +707,8 @@ until-date " ORDER BY msg.datetime DESC LIMIT 0," max-messages "
 			(define-key assistant/assistant-keymap [menu-bar assistantmenu assistantmenuaskchatbot]
 						'("Chat" . assistant/ask-chat))
 
-			(define-key assistant/assistant-keymap [menu-bar assistantmenu assistantmenuaskcodebot]
-						'("Build code" . assistant/build-code))
+			;; (define-key assistant/assistant-keymap [menu-bar assistantmenu assistantmenubuildcode]
+			;; 			'("Build code" . assistant/build-code))
 
 
 			(define-key assistant/assistant-keymap [menu-bar assistantmenu assistantmenusep01] '("--"))
@@ -726,8 +724,8 @@ until-date " ORDER BY msg.datetime DESC LIMIT 0," max-messages "
 			(define-key assistant/assistant-keymap [menu-bar assistantmenu assistantmenuchangechatmodel]
 						'("Change chat model" . assistant/select-chat-model))
 
-			(define-key assistant/assistant-keymap [menu-bar assistantmenu assistantmenuchangecodemodel]
-						'("Change code model" . assistant/change-code-model))
+			;; (define-key assistant/assistant-keymap [menu-bar assistantmenu assistantmenuchangecodemodel]
+			;; 			'("Change code model" . assistant/change-code-model))
 
 			;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 			;; Keyboard shortcuts
@@ -742,7 +740,7 @@ until-date " ORDER BY msg.datetime DESC LIMIT 0," max-messages "
 
 			(define-key assistant/assistant-keymap (kbd assistant/assistant-select-chat-model-keycomb) 'assistant/select-chat-model)
 
-			(define-key assistant/assistant-keymap (kbd assistant/assistant-change-code-model-keycomb) 'assistant/change-code-model)
+			; (define-key assistant/assistant-keymap (kbd assistant/assistant-change-code-model-keycomb) 'assistant/change-code-model)
 
 			(define-key assistant/assistant-keymap (kbd assistant/assistant-toggle-buffer-keycomb) 'assistant/toggle-chat-buffer)
 
