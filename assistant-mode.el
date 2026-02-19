@@ -131,6 +131,14 @@
   :type 'string
   :group 'assistant)
 
+(defcustom assistant/assistant-update-apis-keycomb "C-x / u" "Default key combination for updating all APIs."
+  :type 'string
+  :group 'assistant)
+
+(defcustom assistant/assistant-refresh-chat-keycomb "C-x / r" "Default key combinaton for refreshing the chat buffer."
+  :type 'string
+  :group 'assistant)
+
 (defcustom assistant/assistant-activate-code-chat-keycomb "C-x / c" "Default key combination for activating the chat buffer."
   :type 'string
   :group 'assistant)
@@ -216,6 +224,7 @@ CREATE TABLE messages (
 
 ;; ---- API functions
 (defun assistant/update-all-apis () "Function to update all APIs."
+	   (interactive)
 	   (let ((i 0))
 		 (setq assistant/models-list '()) ; Clear list of models
 		 (when (and (boundp 'assistant/api-subscriptions) assistant/api-subscriptions)
@@ -727,6 +736,11 @@ until-date " ORDER BY msg.datetime DESC LIMIT 0," max-messages "
 			;; (define-key assistant/assistant-keymap [menu-bar assistantmenu assistantmenuchangecodemodel]
 			;; 			'("Change code model" . assistant/change-code-model))
 
+			(define-key assistant/assistant-keymap [menu-bar assistantmenu assistantmenusep03] '("--"))
+
+			(define-key assistant/assistant-keymap [menu-bar assistantmenu assistantmenuupdateallapis]
+						'("Update all APIs" . assistant/update-all-apis))
+
 			;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 			;; Keyboard shortcuts
 
@@ -743,6 +757,8 @@ until-date " ORDER BY msg.datetime DESC LIMIT 0," max-messages "
 			; (define-key assistant/assistant-keymap (kbd assistant/assistant-change-code-model-keycomb) 'assistant/change-code-model)
 
 			(define-key assistant/assistant-keymap (kbd assistant/assistant-toggle-buffer-keycomb) 'assistant/toggle-chat-buffer)
+
+			(define-key assistant/assistant-keymap (kbd assistant/assistant-update-apis-keycomb) 'assistant/update-all-apis)
 
 			assistant/assistant-keymap))
 
