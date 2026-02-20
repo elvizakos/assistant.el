@@ -510,14 +510,21 @@ until-date " ORDER BY msg.datetime DESC LIMIT 0," max-messages "
 		 (cond ((fboundp 'display-line-numbers-mode) (display-line-numbers-mode 0))
 			   ((fboundp 'linum-mode) (linum-mode 0)))
 		 (markdown-mode)
-		 (toggle-truncate-lines 0))
+		 (toggle-truncate-lines 0)
+		 (setq-local header-line-format
+					 '("  Συζήτηση: " (:eval assistant/active-chat))))
 	   assistant/$buffer)
 
 (defun assistant/--refresh-chat-buffer ( &optional date messages-before) "Function to refresh the contents of the chat buffer."
 	   (if (not assistant/active-chat) (setq assistant/active-chat (nth 1 (assistant/--db-get-last-chat))))
 	   (unless messages-before (setq messages-before 20))
 	   (unless date (setq date (current-time))) 
-	   (assistant/--db-load-chat-history assistant/active-chat date messages-before))
+	   (assistant/--db-load-chat-history assistant/active-chat date messages-before)
+
+	   (with-current-buffer assistant/$buffer
+		 (setq-local header-line-format
+					 '("  Συζήτηση: " (:eval assistant/active-chat)))
+		 ))
 
 (defun assistant/split-window () "Function to split frame if there is no second window."
 	   (interactive)
